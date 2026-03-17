@@ -38,7 +38,6 @@ Backend built with PHP and MySQL. Communicates with the frontend via JSON for bo
 
 1. Clone this repository:
 
-`bash
-git clone https://github.com/five-code-nerds/Hotel_Room_Reservation-Backend.git
+```https://github.com/five-code-nerds/Hotel_Room_Reservation-Backend.git
 
 
