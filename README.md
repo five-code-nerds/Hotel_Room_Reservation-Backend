@@ -8,7 +8,7 @@
 | 4 Tekleyesus Asteraw  | 1336/16 | itstoki |
 | 5 Temesgen Belay | 1337/16  | TemesgenBelay21 |
 
-## project title
+## Project title
 
 Hotel room reservation system
 
