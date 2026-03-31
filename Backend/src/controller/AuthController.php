@@ -25,6 +25,9 @@ class AuthController {
             if (!$phone) {
                 throw new \Exception("Phone number is required");
             }
+            if (!$password) {
+                throw new \Exception("Password is required");
+            }
             $user = $service->register($name, $email, $password, $phone);
             echo json_encode([
                 "status" => "success",

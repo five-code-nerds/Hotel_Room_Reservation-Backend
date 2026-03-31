@@ -17,9 +17,7 @@ class AuthService {
         if (!preg_match("/^(09|07)\d{8}$/", $phone)) {
             throw new \Exception("Phone must start with 09 or 07 and have 10 digits");
         }
-        if (!$password) {
-            throw new \Exception("Password is required");
-        }
+
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
             throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore");
         }
