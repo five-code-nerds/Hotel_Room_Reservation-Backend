@@ -30,7 +30,8 @@
             ];
         }
         return [
-            "success" => true,
+            'success' => true,
+            'code' => 200,
             'user' => [
                 "id" => $user['id'],
                 "name" => $user['name'],
