@@ -8,9 +8,6 @@ class AuthService {
 
     public function register($name, $email, $password, $phone) {
 
-        if (!$name) {
-            throw new \Exception("Name is required");
-        }
         if (!preg_match("/^[a-zA-Z ]+$/", $name)) {
             throw new \Exception("Name can only contain letters and spaces");
         }

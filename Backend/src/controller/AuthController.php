@@ -16,6 +16,15 @@ class AuthController {
         $service = new AuthService();
 
         try {
+            if (!$name) {
+                throw new \Exception("Name is required");
+            }
+            if (!$email) {
+                throw new \Exception("Email is required");
+            }
+            if (!$phone) {
+                throw new \Exception("Phone number is required");
+            }
             $user = $service->register($name, $email, $password, $phone);
             echo json_encode([
                 "status" => "success",

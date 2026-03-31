@@ -4,7 +4,6 @@ namespace Src\Model;
 
 use Src\Core\Database;
 use PDO;
-
 class User
 {
 
