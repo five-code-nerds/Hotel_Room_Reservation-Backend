@@ -36,8 +36,21 @@ Backend built with PHP and MySQL. Communicates with the frontend via JSON for bo
 
 ## Setup
 
+Follow these instructions to setup the project locally on your machine.
+
+### Prerequisites
+Ensure you have installed PHP and php package manager composer on your local machine.
+ 
 1. Clone this repository:
 
 https://github.com/five-code-nerds/Hotel_Room_Reservation-Backend.git
+
+2. Install necessary packages:
+
+run this command ```composer init```
+
+3. Run the local server
+
+run this command ```php -S localhost:3000 -t public```
 
 
