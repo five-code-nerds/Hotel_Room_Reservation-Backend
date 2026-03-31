@@ -25,7 +25,7 @@
             http_response_code($user['code']);
             echo json_encode([
                 "status" => "error",
-                "message" => $user['error']
+                "message" => $e->getMessage()
             ]);
         }
     }
