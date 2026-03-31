@@ -47,7 +47,7 @@ https://github.com/five-code-nerds/Hotel_Room_Reservation-Backend.git
 
 2. Install necessary packages:
 
-run this command ```composer init```
+run this command ```composer init``` then again run ```composer install```
 
 3. Run the local server
 
