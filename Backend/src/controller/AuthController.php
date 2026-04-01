@@ -17,24 +17,25 @@ class AuthController {
 
         try {
             if (!$name) {
-                throw new \Exception("Name is required");
+                throw new \Exception("Name is required", 400);
             }
             if (!$email) {
-                throw new \Exception("Email is required");
+                throw new \Exception("Email is required", 400);
             }
             if (!$phone) {
-                throw new \Exception("Phone number is required");
+                throw new \Exception("Phone number is required", 400);
             }
             if (!$password) {
-                throw new \Exception("Password is required");
+                throw new \Exception("Password is required", 400);
             }
             $user = $service->register($name, $email, $password, $phone);
             echo json_encode([
+                http_response_code(201),
                 "status" => "success",
-                "data" => $user
+                "data" => $user['user']
             ]);
         } catch (\Exception $e) {
-            http_response_code(400);
+            http_response_code($e->getCode());
             echo json_encode([
                 "status" => "error",
                 "message" => $e->getMessage()

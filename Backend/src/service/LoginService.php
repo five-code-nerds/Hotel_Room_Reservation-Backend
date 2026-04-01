@@ -9,29 +9,25 @@
 
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \Exception("Invalid email format");
+            throw new \Exception("Invalid email format", 400);
         }
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
-            throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore");
+            throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore", 400);
         }
         $userModel = new User();
-
-        $user = $userModel->getByEmail($email);
+        try {
+            $user = $userModel->getByEmail($email);
+        } catch (\PDOException $e) {
+            throw new \Exception("Internal server error", 500);
+        }
         if (!$user) {
-            return [
-                "error" => "User not found!",
-                "code" => 404
-            ];
+            throw new \Exception("User not found!", 404);
         }
         if (!password_verify($password, $user['password'])) {
-            return [
-                "error" => "Invalid Credentials",
-                "code" => 401
-            ];
+            throw new \Exception("Invalid Credentials", 401);
         }
         return [
             'success' => true,
-            'code' => 200,
             'user' => [
                 "id" => $user['id'],
                 "name" => $user['name'],

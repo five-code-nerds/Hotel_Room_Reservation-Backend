@@ -18,10 +18,13 @@ class User
         $stmt->execute([$name, $email, $password, $phone]);
 
         return [
-            "id" => $db->lastInsertId(),
-            "name" => $name,
-            "email" => $email,
-            "phone" => $phone
+            "success" => true, 
+            "user" => [
+                "id" => $db->lastInsertId(),
+                "name" => $name,
+                "email" => $email,
+                "phone" => $phone
+            ]
         ];
     }
     public function getByEmail($email)

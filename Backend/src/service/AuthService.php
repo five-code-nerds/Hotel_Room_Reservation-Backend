@@ -9,22 +9,27 @@ class AuthService {
     public function register($name, $email, $password, $phone) {
 
         if (!preg_match("/^[a-zA-Z ]+$/", $name)) {
-            throw new \Exception("Name can only contain letters and spaces");
+            throw new \Exception("Name can only contain letters and spaces", 400);
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \Exception("Invalid email format");
+            throw new \Exception("Invalid email format", 400);
         }
         if (!preg_match("/^(09|07)\d{8}$/", $phone)) {
-            throw new \Exception("Phone must start with 09 or 07 and have 10 digits");
+            throw new \Exception("Phone must start with 09 or 07 and have 10 digits", 400);
         }
 
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
-            throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore");
+            throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore", 400);
         }
 
         $hashed = password_hash($password, PASSWORD_BCRYPT);
         $userModel = new User();
-        return $userModel->create($name, $email, $hashed, $phone);
+
+        try {
+            return $userModel->create($name, $email, $hashed, $phone);
+        } catch(\PDOException $e) {
+            throw new \Exception("Internal server error", 500);
+        }
     }
     
 }
