@@ -1,7 +1,6 @@
 <?php
 
     namespace Src\Controller;
-
     use Src\Service\LoginService;
 
     class LoginController {
@@ -11,14 +10,13 @@
         $email = trim($data['email'] ?? "");
         $password = trim($data['password'] ?? "");
         $service = new LoginService();
-
         try {
             if (!$email || !$password) {
                 throw new \Exception("Both Email and Password are required", 400);
             }
             $user = $service->login($email, $password);
+            http_response_code(200);
             echo json_encode([
-                http_response_code(200),
                 "status" => "success",
                 "data" => $user['user']
             ]);

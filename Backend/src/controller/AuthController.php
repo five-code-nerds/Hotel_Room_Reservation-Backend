@@ -1,7 +1,6 @@
 <?php
 
 namespace Src\Controller;
-
 use Src\Service\AuthService;
 
 class AuthController {
@@ -29,8 +28,8 @@ class AuthController {
                 throw new \Exception("Password is required", 400);
             }
             $user = $service->register($name, $email, $password, $phone);
+            http_response_code(201);
             echo json_encode([
-                http_response_code(201),
                 "status" => "success",
                 "data" => $user['user']
             ]);

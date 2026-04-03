@@ -1,5 +1,5 @@
 {
-    "name": "sura/hotel-room-reservation",
+    "name": "Technocrat/hotel-room-reservation",
     "description": "Hotel room reservation php backend",
     "autoload": {
         "psr-4": {
