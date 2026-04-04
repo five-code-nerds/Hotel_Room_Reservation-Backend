@@ -55,7 +55,7 @@ class User
         $db = Database::connect();
 
         $stmt = $db->prepare(
-            "UPDATE users SET is_verified = false, verification_code = ?, code_expires = ? WHERE email = ?"
+            "UPDATE users SET is_verified = 0, verification_code = ?, code_expires = ? WHERE email = ?"
         );
 
         $stmt->execute([$code, $expire_time, $email]);

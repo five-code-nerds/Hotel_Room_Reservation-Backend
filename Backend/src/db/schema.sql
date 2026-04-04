@@ -5,6 +5,9 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    verification_code VARCHAR(10),
+    code_expires DATETIME, 
+    is_verified INT DEFAULT 0
 );
 
 CREATE TABLE room_types (
