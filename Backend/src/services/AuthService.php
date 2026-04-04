@@ -1,12 +1,11 @@
 <?php
 
-namespace Src\Service;
+namespace Src\Services;
 
-use Src\Model\User;
-
+use Src\Models\User;
 class AuthService {
 
-    public function register($name, $email, $password, $phone) {
+    public static function register($name, $email, $password, $phone) {
 
         if (!preg_match("/^[a-zA-Z ]+$/", $name)) {
             throw new \Exception("Name can only contain letters and spaces", 400);
@@ -23,14 +22,25 @@ class AuthService {
         }
 
         $hashed = password_hash($password, PASSWORD_BCRYPT);
-        $userModel = new User();
-
         try {
-            return $userModel->create($name, $email, $hashed, $phone);
+            return User::create($name, $email, $hashed, $phone);
         } catch(\PDOException $e) {
+            throw new \Exception($e->getMessage(), 500);
+        }
+    }
+    public static function getUser($email) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new \Exception("Invalid email format", 400);
+        }
+        try {
+            $user = User::getByEmail($email);
+            if (!$user) {
+                throw new \Exception("User is not found", 400);
+            }
+            return $user;
+        } catch (\PDOException $e) {
             throw new \Exception("Internal server error", 500);
         }
     }
-    
 }
 ?>

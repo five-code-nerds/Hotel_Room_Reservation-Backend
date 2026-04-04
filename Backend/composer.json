@@ -1,5 +1,5 @@
 {
-    "name": "Technocrat/hotel-room-reservation",
+    "name": "sura/hotel-room-reservation",
     "description": "Hotel room reservation php backend",
     "autoload": {
         "psr-4": {
@@ -13,6 +13,6 @@
     ],
     "require": {
         "vlucas/phpdotenv": "^5.6",
-        "phpmailer/phpmailer": "*"
+        "phpmailer/phpmailer": "^6.9"
     }
 }

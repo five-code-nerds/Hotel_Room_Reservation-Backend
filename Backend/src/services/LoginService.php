@@ -1,10 +1,10 @@
 <?php
 
-    namespace Src\Service;
-    use Src\Model\User;
+    namespace Src\Services;
+    use Src\Models\User;
 
     class LoginService {
-    public function login($email, $password)
+    public static function login($email, $password)
     {
 
 
@@ -14,9 +14,8 @@
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
             throw new \Exception("Password must be at least 8 characters and only include letters, numbers, underscore", 400);
         }
-        $userModel = new User();
         try {
-            $user = $userModel->getByEmail($email);
+            $user = User::getByEmail($email);
         } catch (\PDOException $e) {
             throw new \Exception("Internal server error", 500);
         }
@@ -25,6 +24,9 @@
         }
         if (!password_verify($password, $user['password'])) {
             throw new \Exception("Invalid Credentials", 401);
+        }
+        if ($user['is_verified'] != true) {
+            throw new \Exception("Please verify your email", 400);
         }
         return [
             'success' => true,
