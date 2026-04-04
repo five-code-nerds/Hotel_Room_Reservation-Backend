@@ -37,7 +37,7 @@ class EmailService
         $mailer->send();
     }
 
-    public function sendOtp($userModel, $email)
+    public function sendOtp($email)
     {
         $userModel = new User();
         $user = $userModel->getUserByEmail($email);
