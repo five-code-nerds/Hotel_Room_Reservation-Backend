@@ -1,32 +1,35 @@
 <?php
 
-    namespace Src\Controllers;
-    use Src\Services\LoginService;
+namespace Src\Controllers;
 
-    class LoginController {
+use Src\Exceptions\ValidationException;
+use Src\Services\LoginService;
+
+class LoginController
+{
     public function login()
     {
         $data = json_decode(file_get_contents("php://input"), true);
         $email = htmlspecialchars(trim($data['email'])) ?? "";
         $password = htmlspecialchars(trim($data['password'])) ?? "";
-        try {
-            if (!$email || !$password) {
-                throw new \Exception("Both Email and Password are required", 400);
-            }
-            $user = LoginService::login($email, $password);
-            http_response_code(200);
-            echo json_encode([
-                "status" => "success",
-                "data" => $user['user']
-            ]);
-        } catch (\Exception $e) {
-            http_response_code($e->getCode());
-            echo json_encode([
-                "status" => "error",
-                "message" => $e->getMessage()
-            ]);
+        if (!$email) {
+            throw new ValidationException("Email is required");
         }
+        if (!$password) {
+            throw new ValidationException("Password is required");
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new ValidationException("Invalid email format");
+        }
+        if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
+            throw new ValidationException("Password must be at least 8 characters and only include letters, numbers, underscore");
+        }
+        $loginService = new LoginService();
+        $user = $loginService->login($email, $password);
+        http_response_code(200);
+        echo json_encode([
+            "status" => "success",
+            "data" => $user['user']
+        ]);
     }
-    }
-
-?>
+}

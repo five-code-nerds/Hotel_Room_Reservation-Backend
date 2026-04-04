@@ -18,7 +18,6 @@ class User
         $stmt->execute([$name, $email, $password, $phone, null, 0 , null]);
 
         return [
-            "success" => true, 
             "user" => [
                 "id" => $db->lastInsertId(),
                 "name" => $name,
@@ -27,7 +26,7 @@ class User
             ]
         ];
     }
-    public static function getByEmail($email)
+    public static function getUserByEmail($email)
     {
         $db = Database::connect();
 
