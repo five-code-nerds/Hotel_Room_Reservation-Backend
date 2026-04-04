@@ -1,6 +1,7 @@
 <?php
     namespace Src\Controllers;
     use Src\Services\EmailService;
+    use Src\Services\AuthService;
     class VerificationController {
 
         public function sendOtp() {
@@ -41,7 +42,7 @@
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 throw new \Exception("Invalid email format", 400);
             }
-            $is_verified = EmailService::verifyEmail($email, $code);
+            $is_verified = AuthService::verifyEmail($email, $code);
             if ($is_verified) {
                 http_response_code(200);
             } else {

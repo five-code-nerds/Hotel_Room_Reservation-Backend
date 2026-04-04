@@ -28,6 +28,27 @@ class AuthService {
             throw new \Exception($e->getMessage(), 500);
         }
     }
+
+    public static function verifyEmail($email, $verification_code)
+    {
+        try {
+            $user = User::getByEmail($email);
+            $now = date("Y-m-d H:i:s");
+            if (!$user) {
+                throw new \Exception("User not found", 400);
+            }
+            if ($user['code_expires'] < $now) {
+                throw new \Exception("OTP expired", 400);
+            }
+            if ($user['verification_code'] == $verification_code) {
+                return User::verificationUpdate($email);
+            }
+            return null;
+        } catch (\PDOException $e) {
+            throw new \Exception("Internal server error", 500);
+        }
+    }
+    
     public static function getUser($email) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new \Exception("Invalid email format", 400);
