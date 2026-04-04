@@ -2,10 +2,8 @@
 
 namespace Src\Services;
 
-use Dotenv\Dotenv;
 use Src\Models\User;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 use Src\Exceptions\UserNotFoundException;
 
 class EmailService
@@ -13,9 +11,6 @@ class EmailService
     public static function sendVerificationCode($email, $user, $code)
     {
         $mailer = new PHPMailer(true);
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
-        $dotenv->load();
-
         $mailer->isSMTP();
         $mailer->Host = "smtp.gmail.com";
         $mailer->SMTPAuth = true;
@@ -42,7 +37,7 @@ class EmailService
         $mailer->send();
     }
 
-    public function sendOtp($email)
+    public function sendOtp($userModel, $email)
     {
         $userModel = new User();
         $user = $userModel->getUserByEmail($email);
