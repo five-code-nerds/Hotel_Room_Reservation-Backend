@@ -5,7 +5,7 @@ use Src\Core\Database;
 use PDO;
 class User
 {
-    private $db;
+    private PDO $db;
 
     public function __construct()
     {

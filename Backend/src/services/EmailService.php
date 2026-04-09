@@ -8,7 +8,7 @@ use Src\Exceptions\UserNotFoundException;
 
 class EmailService
 {
-    private $userModel;
+    private User $userModel;
     public function __construct()
     {
         $this->userModel = new User();

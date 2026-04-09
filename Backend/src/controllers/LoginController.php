@@ -7,7 +7,7 @@ use Src\Services\LoginService;
 
 class LoginController
 {
-    private $loginService;
+    private LoginService $loginService;
 
     public function __construct()
     {

@@ -9,7 +9,7 @@ use Src\Models\User;
 class AuthService
 {
 
-    private $userModel;
+    private User $userModel;
     public function __construct()
     {
         $this->userModel = new User();

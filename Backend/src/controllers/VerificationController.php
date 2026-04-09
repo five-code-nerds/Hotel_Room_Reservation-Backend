@@ -8,8 +8,8 @@ use Src\Services\AuthService;
 
 class VerificationController
 {
-    private $emailService;
-    private $authService;
+    private EmailService $emailService;
+    private AuthService $authService;
     public function __construct()
     {
         $this->emailService = new EmailService();

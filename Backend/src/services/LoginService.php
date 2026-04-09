@@ -10,7 +10,7 @@ use Src\Core\JWTHandler;
 
 class LoginService
 {
-    private $userModel;
+    private User $userModel;
     public function __construct()
     {
         $this->userModel = new User();
