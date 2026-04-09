@@ -9,18 +9,21 @@ use Src\Models\User;
 class AuthService
 {
 
-    public static function register($name, $email, $password, $phone)
+    private $userModel;
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+    public function register($name, $email, $password, $phone)
     {
 
         $hashed = password_hash($password, PASSWORD_BCRYPT);
-        $userModel = new User();
-        return $userModel->create($name, $email, $hashed, $phone);
+        return $this->userModel->create($name, $email, $hashed, $phone);
     }
 
-    public static function verifyEmail($email, $verification_code)
+    public function verifyEmail($email, $verification_code)
     {
-        $userModel = new User();
-        $user = $userModel->getUserByEmail($email);
+        $user = $this->userModel->getUserByEmail($email);
         $now = date("Y-m-d H:i:s");
         if (!$user) {
             throw new UserNotFoundException("User not found");
@@ -29,14 +32,13 @@ class AuthService
             throw new EmailNotVerifiedException("OTP expired");
         }
         if ($user['verification_code'] == $verification_code) {
-            return $userModel->verificationUpdate($email);
+            return $this->userModel->verificationUpdate($email);
         }
     }
 
-    public static function getUser($email)
+    public function getUser($email)
     {
-        $userModel = new User();
-        $user = $userModel->getUserByEmail($email);
+        $user = $this->userModel->getUserByEmail($email);
         if (!$user) {
             throw new UserNotFoundException("User not found");
         }

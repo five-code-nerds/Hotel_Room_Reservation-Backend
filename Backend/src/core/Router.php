@@ -1,7 +1,6 @@
 <?php
 
 namespace Src\Core;
-use Src\Middlewares\CorsMiddleware;
 class Router
 {
     private $routes = [];
@@ -32,14 +31,22 @@ class Router
     public function resolve()
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        CorsMiddleware::handleCors($method);
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $route = $this->routes[$method][$uri];
 
-        if (isset($this->routes[$method][$uri])) {
-            [$class, $action] = $this->routes[$method][$uri];
+        if (isset($route)) {
+            [$controllerClass, $controllerAction] = $route['controller'];
 
-            $controller = new $class();
-            $controller->$action();
+            if (isset($route['middleware'])) {
+               foreach ($route['middleware'] as $middleware) {
+                    [$middlewareClass, $middlewareAction] = $middleware;
+                    $action = new $middlewareClass();
+                    $action->$middlewareAction();
+               }
+            }
+
+            $controller = new $controllerClass();
+            $controller->$controllerAction();
         } else {
             http_response_code(404);
             echo "Route not found";

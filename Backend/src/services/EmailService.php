@@ -8,7 +8,12 @@ use Src\Exceptions\UserNotFoundException;
 
 class EmailService
 {
-    public static function sendVerificationCode($email, $user, $code)
+    private $userModel;
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+    public function sendVerificationCode($email, $user, $code)
     {
         $mailer = new PHPMailer(true);
         $mailer->isSMTP();
@@ -39,14 +44,13 @@ class EmailService
 
     public function sendOtp($email)
     {
-        $userModel = new User();
-        $user = $userModel->getUserByEmail($email);
+        $user = $this->userModel->getUserByEmail($email);
         if (!$user) {
             throw new UserNotFoundException("User not found");
         }
         $verification_code = random_int(100000, 999999);
         $expire_time = date("Y-m-d H:i:s", strtotime("+5 minutes"));
-        $userModel->otpResendUpdate($email, $verification_code, $expire_time);
+        $this->userModel->otpResendUpdate($email, $verification_code, $expire_time);
         $this->sendVerificationCode($email, $user['name'], $verification_code);
     }
 }

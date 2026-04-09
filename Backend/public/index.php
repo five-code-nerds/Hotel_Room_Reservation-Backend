@@ -2,6 +2,8 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Src\Core\Router;
+use Src\Middlewares\CorsMiddleware;
+use Dotenv\Dotenv;
 
 set_exception_handler(function ($error) {
     $status_code = $error->getCode() ?? 500;
@@ -13,6 +15,10 @@ set_exception_handler(function ($error) {
         ]
     );
 });
+
+CorsMiddleware::handleCors($_SERVER['REQUEST_METHOD']);
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
 $router = new Router();
 require __DIR__ . '/../src/routes/routes.php';
 $router->resolve();

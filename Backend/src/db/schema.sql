@@ -7,21 +7,23 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     verification_code VARCHAR(10),
     code_expires DATETIME, 
-    is_verified INT DEFAULT 0
+    is_verified INT DEFAULT 0,
+    role ENUM('user', 'admin')  NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE room_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    room_catagory ENUM('normal', 'vip') DEFAULT 'normal' NOT NULL,
     beds INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
-    description TEXT
 );
 
 CREATE TABLE rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     room_number VARCHAR(10) NOT NULL UNIQUE,
     room_type_id INT NOT NULL,
+    status ENUM('available','unavailable', 'booked') NOT NULL DEFAULT 'available'
+    image_url VARCHAR(255),
     FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT
 );
 
@@ -35,7 +37,6 @@ CREATE TABLE reservations (
     guest_name VARCHAR(100) NULL,
     guest_email VARCHAR(150) NULL,
     guest_phone VARCHAR(20) NULL,
-    special_requests TEXT,
     status ENUM('booked', 'cancelled', 'completed') DEFAULT 'booked',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,

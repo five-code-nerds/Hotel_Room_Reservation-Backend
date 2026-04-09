@@ -8,7 +8,13 @@ use Src\Services\AuthService;
 
 class VerificationController
 {
-
+    private $emailService;
+    private $authService;
+    public function __construct()
+    {
+        $this->emailService = new EmailService();
+        $this->authService = new AuthService();
+    }
     public function sendOtp()
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -19,8 +25,7 @@ class VerificationController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new ValidationException("Invalid email format");
         }
-        $emailService = new EmailService();
-        $emailService->sendOtp($email);
+        $this->emailService->sendOtp($email);
         http_response_code(200);
         echo json_encode([
             "status" => "success",
@@ -41,8 +46,7 @@ class VerificationController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new ValidationException("Invalid email format");
         }
-        $authService = new AuthService();
-        $authService->verifyEmail($email, $code);
+        $this->authService->verifyEmail($email, $code);
         http_response_code(200);
         echo json_encode([
             "status" => "success",
