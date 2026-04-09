@@ -29,7 +29,6 @@ class AuthService
             throw new EmailNotVerifiedException("OTP expired");
         }
         if ($user['verification_code'] == $verification_code) {
-            $userModel = new User();
             return $userModel->verificationUpdate($email);
         }
     }
