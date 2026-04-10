@@ -4,7 +4,7 @@ CREATE TABLE users (
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     verification_code VARCHAR(10),
     code_expires DATETIME, 
     is_verified INT DEFAULT 0,
@@ -15,14 +15,14 @@ CREATE TABLE room_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     room_catagory ENUM('normal', 'vip') DEFAULT 'normal' NOT NULL,
     beds INT NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     room_number VARCHAR(10) NOT NULL UNIQUE,
     room_type_id INT NOT NULL,
-    status ENUM('available','unavailable', 'booked') NOT NULL DEFAULT 'available'
+    status ENUM('available','unavailable', 'booked') NOT NULL DEFAULT 'available',
     image_url VARCHAR(255),
     FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT
 );

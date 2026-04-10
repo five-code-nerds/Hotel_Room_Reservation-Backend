@@ -1,8 +1,8 @@
 <?php
     use Src\Controllers\AuthController;
     use Src\Controllers\LoginController;
-use Src\Controllers\ReservationController;
-use Src\Controllers\VerificationController;
+    use Src\Controllers\ReservationController;
+    use Src\Controllers\VerificationController;
     use Src\Controllers\RoomController;
     use Src\Middlewares\AuthMiddleware;
 
