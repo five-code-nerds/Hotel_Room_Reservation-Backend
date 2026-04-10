@@ -13,9 +13,7 @@
             return JWT::encode($payload, $this->secret['secret'], 'HS256');
         }
         public function decode($token) {
-            $decoded = JWT::decode($token, new Key($this->secret['secret'], 'HS256'));
-            $_REQUEST['user'] = $decoded;
-            return $decoded;
+            return JWT::decode($token, new Key($this->secret['secret'], 'HS256'));
         }
     }
 ?>

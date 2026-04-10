@@ -10,7 +10,7 @@
     $router->post('/login', ['controller' =>[LoginController::class, 'login']]);
     $router->post('/verify-email', ['controller' =>[VerificationController::class, 'verify']]);
     $router->post('/send-otp', ['controller' =>[VerificationController::class, 'sendOtp']]);
-    $router->post('/reservaions', ['controller' => [ReservationController::class, 'book']]);
+    $router->post('/reservations', ['controller' => [ReservationController::class, 'book']]);
     $router->get('/user', ['controller' => [AuthController::class, 'user']]);
     $router->get('/rooms', ['controller' => [RoomController::class, 'getAvailableRooms']]);
     $router->get('/reservations', ['controller' => [ReservationController::class, 'getReservation']]);
@@ -22,13 +22,13 @@
             [AuthMiddleware::class, 'isAdmin']
         ]
     ]);
-    $router->patch('/admin/rooms/{room_number}/status', [
+    $router->patch('/admin/rooms/{room_number}/price', [
         'controller' => [RoomController::class, 'updateRoomPrice'],
         'middleware' => [
             [AuthMiddleware::class, 'isAdmin']
         ]
     ]);
-    $router->patch('/admin/rooms/{room_number}/disable', [
+    $router->patch('/admin/rooms/{room_number}/status', [
         'controller' => [RoomController::class, 'disableRoom'],
         'middleware' => [
             [AuthMiddleware::class, 'isAdmin']
@@ -40,7 +40,7 @@
             [AuthMiddleware::class, 'isAdmin']
         ]
     ]);
-    $router->patch('/admin/reservations', [
+    $router->get('/admin/reservations', [
         'controller' => [ReservationController::class, 'getAllReservations'],
         'middleware' => [
             [AuthMiddleware::class, 'isAdmin']

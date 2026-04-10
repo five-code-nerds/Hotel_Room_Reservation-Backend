@@ -9,6 +9,7 @@
             $token = trim($_SERVER['HTTP_AUTHORIZATION']);
             $jwtHandler = new JWTHandler();
             $payload = $jwtHandler->decode($token);
+            $_REQUEST['user'] = $payload;
             if (!$token) {
                 throw new UnauthorizedException("Token is required");
             }

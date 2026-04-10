@@ -17,7 +17,7 @@ set_exception_handler(function ($error) {
 });
 
 CorsMiddleware::handleCors($_SERVER['REQUEST_METHOD']);
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 $router = new Router();
 require __DIR__ . '/../src/routes/routes.php';
