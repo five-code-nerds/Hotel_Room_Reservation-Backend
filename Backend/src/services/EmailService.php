@@ -40,6 +40,10 @@ class EmailService
                 </p>
             ";
         $mailer->send();
+        return [
+            'message' => 'Email sent successfully',
+            'data' => null
+        ];
     }
 
     public function sendOtp($email)
@@ -52,5 +56,9 @@ class EmailService
         $expire_time = date("Y-m-d H:i:s", strtotime("+5 minutes"));
         $this->userModel->otpResendUpdate($email, $verification_code, $expire_time);
         $this->sendVerificationCode($email, $user['name'], $verification_code);
+        return [
+            'message' => 'OTP sent successfully',
+            'data' => null
+        ];
     }
 }

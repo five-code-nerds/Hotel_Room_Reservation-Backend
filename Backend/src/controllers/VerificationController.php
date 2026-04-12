@@ -25,11 +25,12 @@ class VerificationController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new ValidationException("Invalid email format");
         }
-        $this->emailService->sendOtp($email);
+        $result = $this->emailService->sendOtp($email);
         http_response_code(200);
         echo json_encode([
-            "status" => "success",
-            "data" => "OTP sent"
+            'status' => 'success',
+            'message' => $result['message'],
+            'data' => $result['data']
         ]);
     }
     public function verify()
@@ -46,11 +47,12 @@ class VerificationController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new ValidationException("Invalid email format");
         }
-        $this->authService->verifyEmail($email, $code);
+        $result = $this->authService->verifyEmail($email, $code);
         http_response_code(200);
         echo json_encode([
-            "status" => "success",
-            "data" => "Email verified"
+            'status' => 'success',
+            'message' => $result['message'],
+            'data' => $result['data']
         ]);
     }
 }

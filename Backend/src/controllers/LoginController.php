@@ -30,12 +30,13 @@ class LoginController
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
             throw new ValidationException("Password must be at least 8 characters and only include letters, numbers, underscore");
         }
-        $user = $this->loginService->login($email, $password);
+        $result = $this->loginService->login($email, $password);
         http_response_code(200);
         echo json_encode([
-            "status" => "success",
-            "data" => $user['user'],
-            'access_token' => $user['token']
+            'status' => 'success',
+            'message' => $result['message'],
+            'data' => $result['data']['user'],
+            'access_token' => $result['data']['token']
         ]);
     }
 }

@@ -42,11 +42,12 @@ class AuthController
         if (!preg_match("/^[a-zA-Z0-9_]{8,}$/", $password)) {
             throw new ValidationException("Password must be at least 8 characters and only include letters, numbers, underscore");
         }
-        $user = $this->authService->register($name, $email, $password, $phone);
+        $result = $this->authService->register($name, $email, $password, $phone);
         http_response_code(201);
         echo json_encode([
             "status" => "success",
-            "data" => $user['user']
+            "message" => $result['message'],
+            "data" => $result['data']
         ]);
     }
 
@@ -60,14 +61,15 @@ class AuthController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new ValidationException("Invalid email is format");
         }
-        $user = $this->authService->getUser($email);
+        $result = $this->authService->getUser($email);
         http_response_code(200);
         echo json_encode([
             "status" => "success",
+            "message" => $result['message'],
             "data" => [
-                "name" => $user['name'],
-                "email" => $user['email'],
-                "phone" =>  $user['phone'],
+                "name" => $result['name'],
+                "email" => $result['email'],
+                "phone" =>  $result['phone']
             ]
         ]);
     }

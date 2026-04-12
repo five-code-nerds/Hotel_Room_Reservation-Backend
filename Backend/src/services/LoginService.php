@@ -24,25 +24,28 @@ class LoginService
         if (!password_verify($password, $user['password'])) {
             throw new InvalidCredentialException("Invalid Credentials");
         }
-        if ($user['is_verified'] != true) {
+        if (!$user['is_verified']) {
             throw new EmailNotVerifiedException("Email not verified");
         }
         $payload = [
             'sub' => $user['id'],
             'role' => $user['role'],
             'iat' => time(),
-            'exp'=> time() + 3600
+            'exp'=> time() + 3600 * 24
         ];
         $jwtHandeler = new JWTHandler();
         $token = $jwtHandeler->encode($payload);
         return [
-            'user' => [
-                "id" => $user['id'],
-                "name" => $user['name'],
-                "email" => $user['email'],
-                "role" => $user['role']
-            ],
-            'token' => $token
+            'message' => 'User logged in successfully',
+            'data' => [
+                'user' => [
+                    "id" => $user['id'],
+                    "name" => $user['name'],
+                    "email" => $user['email'],
+                    "role" => $user['role']
+                ],
+                'token' => $token
+            ]
         ];
     }
 }

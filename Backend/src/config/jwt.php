@@ -1,5 +1,5 @@
 <?php
     return [
-        'secret' => $_ENV['`SECRET']
+        'secret' => $_ENV['SECRET']
     ]
 ?>
