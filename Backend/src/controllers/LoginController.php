@@ -16,8 +16,8 @@ class LoginController
     public function login()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        $email = htmlspecialchars(trim($data['email'])) ?? "";
-        $password = htmlspecialchars(trim($data['password'])) ?? "";
+        $email = trim($data['email'] ?? null);
+        $password = trim($data['password' ?? null]);
         if (!$email) {
             throw new ValidationException("Email is required");
         }

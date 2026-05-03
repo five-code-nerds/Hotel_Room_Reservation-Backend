@@ -21,7 +21,7 @@ class EmailService
         $mailer->SMTPAuth = true;
         $mailer->Username = $_ENV['EMAIL'];
         $mailer->Password =  $_ENV['APP'];
-        $mailer->SMTPSecure = "tls";
+        $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mailer->Port = 587;
         $mailer->setFrom($_ENV['EMAIL'], "Verify your account");
         $mailer->addAddress($email);

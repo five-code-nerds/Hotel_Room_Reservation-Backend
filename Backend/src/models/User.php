@@ -1,8 +1,12 @@
 <?php
 
 namespace Src\Models;
-use Src\Core\Database;
+
 use PDO;
+use Src\Core\Database;
+use PDOException;
+use Src\Exceptions\DatabaseException;
+
 class User
 {
     private PDO $db;
@@ -14,7 +18,7 @@ class User
 
     public function create($name, $email, $password, $phone)
     {
-
+        try {
         $stmt = $this->db->prepare(
             "INSERT INTO users (name, email, password, phone, verification_code, is_verified , code_expires) VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
@@ -29,10 +33,13 @@ class User
                 "phone" => $phone
             ]
         ];
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
     public function getUserByEmail($email)
     {
-
+        try {
         $stmt = $this->db->prepare(
             "SELECT * FROM users WHERE email = ?"
         );
@@ -40,24 +47,49 @@ class User
         $stmt->execute([$email]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
+    }
+    public function getUserById($userId)
+    {
+        try {
+        $stmt = $this->db->prepare(
+            "SELECT * FROM users WHERE id = ?"
+        );
+
+        $stmt->execute([$userId]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
     public function verificationUpdate($email) {
-
+        try {
         $stmt = $this->db->prepare(
             "UPDATE users SET is_verified = 1, verification_code = null, code_expires = null WHERE email = ?"
         );
 
         return $stmt->execute([$email]);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 
     public function otpResendUpdate($email, $code, $expire_time)
     {
 
-        $stmt = $this->db->prepare(
-            "UPDATE users SET is_verified = 0, verification_code = ?, code_expires = ? WHERE email = ?"
-        );
+        try {
 
-        return $stmt->execute([$code, $expire_time, $email]);
+            $stmt = $this->db->prepare(
+            "UPDATE users SET is_verified = 0, verification_code = ?, code_expires = ? WHERE email = ?"
+            );
+
+            return $stmt->execute([$code, $expire_time, $email]);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 }
 ?>

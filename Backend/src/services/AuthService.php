@@ -22,10 +22,10 @@ class AuthService
             throw new ValidationException("User already exists");
         }
         $hashed = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->create($name, $email, $hashed, $phone);
+        $result =  $this->userModel->create($name, $email, $hashed, $phone);
         return [
             'message' => 'User account created',
-            'data' => null
+            'data' => $result['user']
         ];
     }
 
@@ -48,14 +48,29 @@ class AuthService
         }
     }
 
-    public function getUser($email)
+    public function getUserByEmail($email)
     {
         $user = $this->userModel->getUserByEmail($email);
         if (!$user) {
             throw new UserNotFoundException("User not found");
         }
         return [
-            'message' => 'User account created',
+            'message' => 'Getting user details',
+            'data' => [
+                "name" => $user['name'],
+                "email" => $user['email'],
+                "phone" =>  $user['phone']
+            ]
+        ];
+    }
+    public function getUserById($userId)
+    {
+        $user = $this->userModel->getUserById($userId);
+        if (!$user) {
+            throw new UserNotFoundException("User not found");
+        }
+        return [
+            'message' => 'Getting user details',
             'data' => [
                 "name" => $user['name'],
                 "email" => $user['email'],

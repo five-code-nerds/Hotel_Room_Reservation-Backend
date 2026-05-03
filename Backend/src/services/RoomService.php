@@ -2,8 +2,9 @@
 
 namespace Src\Services;
 
-use Src\Models\Room;
+use Exception;
 use Src\Exceptions\ValidationException;
+use Src\Models\Room;
 
 class RoomService
 {
@@ -29,7 +30,11 @@ class RoomService
         $availableRooms = [];
 
         foreach ($allRooms as $room) {
-            if ($this->roomModel->isAvailable($room['id'], $check_in, $check_out)) {
+            $roomAvailable = $this->roomModel->isRoomAvailable($room['id']);
+            if (!$roomAvailable || $roomAvailable['status'] !== 'available') {
+                continue;
+            }
+            if ($this->roomModel->canBeReserved($room['id'], $check_in, $check_out)){
                 $availableRooms[] = $room;
             }
         }
@@ -63,8 +68,12 @@ class RoomService
         ];
     }
 
-    public function createRoomType($room_category, $beds, $price) {
-        $this->roomModel->createRoomType($room_category, $beds, $price);
+    public function createRoomType($roomCategory, $beds, $price) {
+        $roomType = $this->roomModel->roomTypeExist($roomCategory, $beds);
+        if ($roomType) {
+            throw new Exception("Room type already exits");
+        }
+        $this->roomModel->createRoomType($roomCategory, $beds, $price);
         return [
             'message' => 'Room type created',
             'data' => null
@@ -73,6 +82,10 @@ class RoomService
 
     public function createRoom($roomNumber, $roomTypeId, $imageUrl)
     {
+        $roomTypeExist = $this->roomModel->roomType($roomTypeId);
+        if (!$roomTypeExist) {
+            throw new ValidationException("Room type id doesn't exist");
+        }
         $this->roomModel->createRoom($roomNumber , $roomTypeId, $imageUrl);
         return [
             'message' => 'Room created',

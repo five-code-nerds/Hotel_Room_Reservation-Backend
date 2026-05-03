@@ -18,7 +18,7 @@ class VerificationController
     public function sendOtp()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        $email = htmlspecialchars(trim($data['email'])) ?? "";
+        $email = trim($data['email'] ?? null);
         if (!$email) {
             throw new ValidationException("Email is required");
         }
@@ -36,8 +36,8 @@ class VerificationController
     public function verify()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        $email = htmlspecialchars(trim($data['email'])) ?? "";
-        $code = htmlspecialchars(trim($data['code'])) ?? "";
+        $email = trim($data['email'] ?? null);
+        $code = trim($data['code'] ?? null);
         if (!$code) {
             throw new ValidationException("Verification code is required");
         }

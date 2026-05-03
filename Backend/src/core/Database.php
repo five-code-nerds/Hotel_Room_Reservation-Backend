@@ -9,10 +9,12 @@ class Database
     public static function connect()
     {
         $config = require __DIR__ . '/../config/database.php';
-        return new PDO(
+        $pdo = new PDO(
             $config['dsn'],
             $config['user'],
             $config['password']
         );
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
     }
 }
