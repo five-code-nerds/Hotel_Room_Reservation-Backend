@@ -139,12 +139,12 @@ class RoomController
         if (!$roomTypeId || !filter_var($roomTypeId, FILTER_VALIDATE_INT)) {
             throw new ValidationException("Room type id is required and must be an interger");
         }
-        // if (!$imageUrl) {
-        //     throw new ValidationException('Image url is required');
-        // }
-        // if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-        //     throw new ValidationException('Invalid url');
-        // }
+         if (!$imageUrl) {
+            throw new ValidationException('Image url is required');
+         }
+         if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+             throw new ValidationException('Invalid url');
+        }
         $result = $this->roomService->createRoom($roomNumber, $roomTypeId, $imageUrl);
 
         echo json_encode([
