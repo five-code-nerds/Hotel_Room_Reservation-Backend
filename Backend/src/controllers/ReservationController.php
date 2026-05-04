@@ -1,117 +1,110 @@
 <?php
 
-namespace Src\Controllers;
+namespace Src\Services;
 
 use Src\Exceptions\ValidationException;
-use Src\Services\ReservationService;
+use Src\Models\Reservation;
+use Src\Models\Payment;
+use Src\Models\Room;
 
-class ReservationController
+class ReservationService
 {
-    private ReservationService $reservationService;
+    private Room $roomModel;
+    private Reservation $reservationModel;
+    private Payment $paymentModel;
+    private PaymentService $paymentService;
 
     public function __construct()
     {
-        $this->reservationService = new ReservationService();
+        $this->roomModel = new Room();
+        $this->reservationModel = new Reservation();
+        $this->paymentModel = new Payment();
+        $this->paymentService = new PaymentService();
     }
 
-    public function book()
+    public function getReservationById($userId)
     {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $user = $_REQUEST['user'] ?? "";
-        $reservationData = [
-            'room_id' => (int)$data['room_id'],
-            'check_in' => htmlspecialchars(trim($data['check_in'])),
-            'check_out' => htmlspecialchars(trim($data['check_out'])),
-            'number_of_guests' => (int)$data['number_of_guests']
+        $result = $this->reservationModel->getReservationByUserId($userId);
+        return [
+            'message' => $result ? 'User reservation info retrieved' : 'No reservation found',
+            'data' => $result
         ];
-
-        if($user) {
-            $data = [
-                'user_id' => (int)$user->user_id,
-                'guest_name' => null,
-                'guest_email' => null,
-                'guest_phone' => null
-            ];
-            $reservationData =  array_merge($reservationData, $data);
+    }
+    public function getReservationByEmail($email)
+    {
+        $result = $this->reservationModel->getReservationByUserEmail($email);
+        return [
+            'message' => $result ? 'User reservation info retrieved' : 'No reservation found',
+            'data' => $result
+        ];
+    }
+    public function getAllReservations() {
+        $result = $this->reservationModel->getAllReservations();
+        return [
+            'message' => 'All reservations infos retrieved',
+            'data' => $result
+        ];
+    }
+    public function makeReservation($reservationData)
+    {
+        if ($reservationData['user_id']) {
+            $isUserReservedBefore = $this->reservationModel->getReservationByUserId($reservationData['user_id']);
+            if ($isUserReservedBefore) {
+                throw new ValidationException("User already has reservations");
+        
+            }
         } else {
-            $data = [
-                'user_id' => null,
-                'guest_name' => htmlspecialchars(trim($data['guest_name'])),
-                'guest_email' => filter_var(trim($data['guest_email']), FILTER_VALIDATE_EMAIL),
-                'guest_phone' => htmlspecialchars(trim($data['guest_phone']))
-            ];
-            $reservationData = array_merge($reservationData, $data);
+            $isUserReservedBefore = $this->reservationModel->getReservationByUserEmail($reservationData['guest_email']);
+            if ($isUserReservedBefore) {
+                throw new ValidationException("User already has reservations");
+            }
+        }
+        $room = $this->roomModel->isRoomAvailable($reservationData['room_id']);
+        if (!$room || $room['status'] !== 'available') {
+            throw new ValidationException("Room is not currently available");
+        }
+        if (!$this->roomModel->canBeReserved($reservationData['room_id'], $reservationData['check_in'], $reservationData['check_out'])) {
+            throw new ValidationException("Room is not available for the selected dates");
         }
 
-        $result = $this->reservationService->makeReservation($reservationData);
+        return $this->reservationModel->makeReservation($reservationData);
 
-        echo json_encode([
-            'status' => 'success',
-            'message' => $result['message'],
-            'data' => $result['data']
-        ]);
     }
-
-    public function cancel()
+    public function cancelReservation($reservationData)
     {
-        $user = $_REQUEST['user'] ?? "";
-        if ($user) {
-            $reservation = $this->reservationService->getReservation($user->user_id);
-            if (!$reservation) {
-                throw new ValidationException("Reservation not found");
-            }
-            $reservation_id = $reservation['data']['reservation_id'];
-            if ($reservation['data']['user_id'] !== $user->user_id) {
-                throw new ValidationException("You are not allowed to cancel this reservation");
-            }
-            $result = $this->reservationService->cancelReservation((int)$reservation_id);
-        } else  {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $email = htmlspecialchars(trim($data['guest_email'])) ?? "";
-            if (!$email) {
-                throw new ValidationException("Email is required");
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new ValidationException("Invalid email format");
-            }
-            $reservation = $this->reservationService->getReservationByEmail($email);
-            if (!$reservation) {
-                throw new ValidationException("Reservation not found");
-            }
-            $reservation_id = $reservation['data']['reservation_id'];
-            if ($reservation['data']['user_id'] !== $user->user_id) {
-                throw new ValidationException("You are not allowed to cancel this reservation");
-            }
-            $result = $this->reservationService->cancelReservation((int)$reservation_id);
+        if ($reservationData['user_id']) {
+
+            $result = $this->reservationModel->cancelReservationByUserId(
+                $reservationData['user_id']
+            );
+
+            $payment = $this->paymentModel->findPaymentByTransactionRef(
+                $result['transaction_ref'] ?? null
+            );
+        } else {
+
+            $result = $this->reservationModel->cancelReservationByUserEmail(
+                $reservationData['guest_email']
+            );
+
+            $payment = $this->paymentModel->findPaymentByTransactionRef(
+                $result['transaction_ref'] ?? null
+            );
         }
-        echo json_encode([
-            'status' => 'success',
-            'data' => $result['message']
-        ]);
-    }
-    public function getReservation()
-    {
-        $userId = (int)$_REQUEST['user']->id ?? null;
-        if (!$userId) {
-            throw new ValidationException("User ID is required");
+
+        if ($payment && $payment["payment_status"] === "paid") {
+            $this->paymentService->refundPayment($payment["transaction_ref"]);
         }
-        $result = $this->reservationService->getReservation($userId);
 
-        echo json_encode([
-            'status' => 'success',
-            'message' => $result['message'],
-            'data' => $result['data']
-        ]);
+        return [
+            'message' => $result ? 'Reservation cancelled' : 'No active reservation found',
+            'data' => $result ? ($reservationData['user_id'] ?? $reservationData['guest_email']) : null
+        ];
     }
-    public function getAllReservations()
-    {
-        $result = $this->reservationService->getAllReservations();
 
-        echo json_encode([
-            'status' => 'success',
-            'message' => $result['message'],
-            'data' => $result['data']
-        ]);
+    public function confirmReservation($reservationId)
+    {
+        $this->reservationModel->updateReservationStatus($reservationId, "confirmed");
     }
 }
 ?>
