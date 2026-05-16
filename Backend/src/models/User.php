@@ -3,8 +3,8 @@
 namespace Src\Models;
 
 use PDO;
-use Src\Core\Database;
 use PDOException;
+use Src\Core\Database;
 use Src\Exceptions\DatabaseException;
 
 class User

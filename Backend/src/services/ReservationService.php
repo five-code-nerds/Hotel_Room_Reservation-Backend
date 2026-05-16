@@ -6,6 +6,7 @@ use Src\Exceptions\ValidationException;
 use Src\Models\Reservation;
 use Src\Models\Payment;
 use Src\Models\Room;
+use PDO;
 
 class ReservationService
 {
@@ -24,7 +25,7 @@ class ReservationService
 
     public function getReservationById($userId)
     {
-        $result = $this->reservationModel->getReservationByUserId($userId);
+        $result = $this->reservationModel->getReservationsByUserId($userId);
         return [
             'message' => $result ? 'User reservation info retrieved' : 'No reservation found',
             'data' => $result
@@ -48,10 +49,9 @@ class ReservationService
     public function makeReservation($reservationData)
     {
         if ($reservationData['user_id']) {
-            $isUserReservedBefore = $this->reservationModel->getReservationByUserId($reservationData['user_id']);
+            $isUserReservedBefore = $this->reservationModel->getReservationsByUserId($reservationData['user_id']);
             if ($isUserReservedBefore) {
                 throw new ValidationException("User already has reservations");
-        
             }
         } else {
             $isUserReservedBefore = $this->reservationModel->getReservationByUserEmail($reservationData['guest_email']);
@@ -59,16 +59,24 @@ class ReservationService
                 throw new ValidationException("User already has reservations");
             }
         }
-        $room = $this->roomModel->isRoomAvailable($reservationData['room_id']);
-        if (!$room || $room['status'] !== 'available') {
+        $room = $this->roomModel->getRoomStatus($reservationData['room_id'], "available");
+        if (!$room) {
             throw new ValidationException("Room is not currently available");
         }
-        if (!$this->roomModel->canBeReserved($reservationData['room_id'], $reservationData['check_in'], $reservationData['check_out'])) {
+        if (!$this->roomModel->isAvailable($reservationData['room_id'], $reservationData['check_in'], $reservationData['check_out'])) {
             throw new ValidationException("Room is not available for the selected dates");
         }
-
-        return $this->reservationModel->makeReservation($reservationData);
-
+        $db = $this->reservationModel->getConnection();
+        try {
+        $db->beginTransaction();
+        $reservation = $this->reservationModel->makeReservation($reservationData);
+        $$this->paymentModel->createPayment($reservation['data']);
+        $db->commit();
+        } catch(\Throwable $error) {
+            $db->rollBack();
+            throw $error;
+        }
+        return $this->paymentService->initiatePayment($reservation['data']);
     }
     public function cancelReservation($reservationData)
     {
@@ -104,7 +112,7 @@ class ReservationService
 
     public function confirmReservation($reservationId)
     {
-        $this->reservationModel->updateReservationStatus($reservationId, "confirmed");
+        return $this->reservationModel->updateReservationStatus($reservationId, "confirmed");
     }
 }
 ?>

@@ -2,8 +2,10 @@
 
 namespace Src\Models;
 
-use Src\Core\Database;
 use PDO;
+use PDOException;
+use Src\Core\Database;
+use Src\Exceptions\DatabaseException;
 
 class Payment
 {
@@ -16,6 +18,7 @@ class Payment
 
     public function createPayment($data)
     {
+        try {
         $stmt = $this->db->prepare("
             INSERT INTO payments
             (reservation_id, amount, payment_method, transaction_ref , payment_status)
@@ -31,25 +34,36 @@ class Payment
         ]);
 
         return $this->db->lastInsertId();
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 
     public function findPaymentByTransactionRef($transaction_ref)
     {
+        try {
         $stmt = $this->db->prepare("
             SELECT * FROM payments WHERE transaction_ref = ?
         ");
 
         $stmt->execute([$transaction_ref]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 
     public function updatePaymentStatus($transaction_ref, $status)
     {
+        try {
         $stmt = $this->db->prepare("
             UPDATE payments SET payment_status = ? WHERE transaction_ref = ?
         ");
 
         $stmt->execute([$status, $transaction_ref]);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 }
 

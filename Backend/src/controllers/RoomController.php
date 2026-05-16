@@ -55,14 +55,14 @@ class RoomController
     {
         $data = json_decode(file_get_contents("php://input"), true);
         $price = trim($data['price'] ?? null);
-        $room_catagory = trim($data['room_catagory'] ?? null);
+        $room_category = trim($data['room_category'] ?? null);
         $beds = trim($data['beds'] ?? null);
 
         if (!$price || !filter_var($price, FILTER_VALIDATE_FLOAT)) {
             throw new ValidationException("Price is required and must be a number");
         }
 
-        if (!$room_catagory || !in_array($room_catagory, ['normal', 'vip'])) {
+        if (!$room_category || !in_array($room_category, ['normal', 'vip'])) {
             throw new ValidationException("Room category is required and must be either normal or vip");
         }
 
@@ -70,7 +70,7 @@ class RoomController
             throw new ValidationException("Number of beds is required and must be an integer");
         }
 
-        $result = $this->roomService->updateRoomPrice((float)$price, $room_catagory, (int)$beds);
+        $result = $this->roomService->updateRoomPrice((float)$price, $room_category, (int)$beds);
 
         echo json_encode([
             'status' => 'success',
@@ -106,19 +106,19 @@ class RoomController
         $data = json_decode(file_get_contents("php://input"), true);
 
         $price = trim($data['price'] ?? null);
-        $room_catagory = trim($data['room_catagory'] ?? null);
+        $room_category = trim($data['room_category'] ?? null);
         $beds = trim($data['beds'] ?? null);
 
         if (!$price || !filter_var($price, FILTER_VALIDATE_FLOAT)) {
             throw new ValidationException("Price is required and must be a number");
         }
-        if (!$room_catagory || !in_array($room_catagory, ['normal', 'vip'])) {
+        if (!$room_category || !in_array($room_category, ['normal', 'vip'])) {
             throw new ValidationException("Room category is required");
         }
         if (!$beds || !filter_var($beds, FILTER_VALIDATE_INT)) {
             throw new ValidationException("Number of beds is required and must be an integer");
         }
-        $result = $this->roomService->createRoomType($room_catagory, $beds, $price);
+        $result = $this->roomService->createRoomType($room_category, $beds, $price);
         echo json_encode([
             'status' => 'success',
             'message' => $result['message'],

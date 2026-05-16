@@ -13,7 +13,7 @@ CREATE TABLE users (
 
 CREATE TABLE room_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    room_catagory ENUM('normal', 'vip') DEFAULT 'normal' NOT NULL,
+    room_category ENUM('normal', 'vip') DEFAULT 'normal' NOT NULL,
     beds INT NOT NULL,
     price DECIMAL(10,2) NOT NULL
 );

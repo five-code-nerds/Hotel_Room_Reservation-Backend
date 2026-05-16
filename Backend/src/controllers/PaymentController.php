@@ -21,8 +21,8 @@ class PaymentController
 
         http_response_code(200);
         echo json_encode([
-            "status" => $result['status'],
-            "message" => "Payment success",
+            "status" => "success",
+            "message" => $result['message'],
             "data" => $result['data']
         ]);
     }

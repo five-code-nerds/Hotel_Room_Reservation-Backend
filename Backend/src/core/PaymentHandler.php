@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Core\PaymentHandler;
+namespace Src\Core;
 
 class PaymentHandler
 {

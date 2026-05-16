@@ -28,15 +28,12 @@ class RoomService
     {
         $allRooms = $this->roomModel->getAllRooms();
         $availableRooms = [];
-
         foreach ($allRooms as $room) {
-            $roomAvailable = $this->roomModel->isRoomAvailable($room['id']);
-            if (!$roomAvailable || $roomAvailable['status'] !== 'available') {
+            $roomAvailable = $this->roomModel->isAvailable($room['id'], $check_in, $check_out);
+            if (!$roomAvailable) {
                 continue;
             }
-            if ($this->roomModel->canBeReserved($room['id'], $check_in, $check_out)){
-                $availableRooms[] = $room;
-            }
+            $availableRooms[] = $room;
         }
         if (empty($availableRooms)) {
             return [

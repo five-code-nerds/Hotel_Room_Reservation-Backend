@@ -15,9 +15,7 @@ class BookingController
     public function __construct()
     {
         $this->reservationService = new ReservationService();
-        $this->paymentService = new PaymentService();
     }
-
     public function book()
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -88,15 +86,13 @@ class BookingController
             $reservationData = array_merge($reservationData, $data);
         }
 
-        $reservation  = $this->reservationService->makeReservation($reservationData);
-
-        $payment = $this->paymentService->initiatePayment($reservation);
+        $result  = $this->reservationService->makeReservation($reservationData);
 
         http_response_code(302);
         echo json_encode([
             "message" => "Redirect to payment gateway",
-            "checkout_url" => $payment['checkout_url'],
-            "transaction_ref" => $payment['transaction_ref']
+            "checkout_url" => $result['checkout_url'],
+            "transaction_ref" => $result['transaction_ref']
         ]);
     }
 

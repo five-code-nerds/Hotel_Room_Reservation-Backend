@@ -2,24 +2,24 @@
 
 namespace Src\Services;
 
-use Src\Core\PaymentHandler\PaymentHandler;
+use Src\Core\PaymentHandler;
 use Src\Exceptions\UnauthorizedException;
 use Src\Exceptions\ValidationException;
 use Src\Models\Payment;
 use Src\Models\Room;
-use Src\Models\Reservation;
+use Src\Services\ReservationService;
 
 class PaymentService
 {
     private Payment $paymentModel;
     private Room $roomModel;
-    private Reservation $reservationModel;
+    private ReservationService $reservationService;
 
     public function __construct()
     {
         $this->paymentModel = new Payment();
         $this->roomModel = new Room();
-        $this->reservationModel = new Reservation();
+        $this->reservationService = new ReservationService();
     }
 
  
@@ -31,7 +31,7 @@ class PaymentService
 
         $this->paymentModel->createPayment([
             "reservation_id" => $reservation['reservation_id'],
-            "amount" => $amount,
+            "amount" => $amount["price"],
             "payment_method" => "chapa",
             "transaction_ref" => $transaction_ref,
             "payment_status" => "pending"
@@ -89,33 +89,36 @@ class PaymentService
         }
 
         $transaction_ref = $payload['tx_ref'] ?? null;
-        $status = $payload['status'] ?? null;
 
         if (!$transaction_ref) {
             throw new ValidationException("Invalid payload");
-        }
+       }
 
         $verify = $this->verifyPayment($transaction_ref);
 
-        if (!isset($verify['status']) || $verify['status'] !== 'success') {
+        if (!isset($verify['data']['status']) || $verify['data']['status'] !== 'success') {
             throw new ValidationException("Payment not verified");
         }
 
         $payment = $this->paymentModel->findPaymentByTransactionRef($transaction_ref);
-
+        
+        if ($payment ||  $payment['payment_status'] === 'paid') {
+            return [
+                "message" => "Already processed"
+            ];
+        }
         if ($payment) {
             $this->paymentModel->updatePaymentStatus(
                 $transaction_ref,
-                $status === "success" ? "paid" : "failed"
+                "paid"
             );
-            $this->reservationModel->updateReservationStatus(
-                $payment["reservation_id"],
-                $status === "success" ? "confirmed" : "failed"
+            $this->reservationService->confirmReservation(
+                $payment["reservation_id"],            
             );
         }
 
         return [
-            "status" => $status === "success" ? "success" : "Failed",
+            "message" => "Webhook processed sucessfully",
             "data" => $transaction_ref
         ];
 
